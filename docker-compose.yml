@@ -1,0 +1,62 @@
+services:
+ 
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: plately-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-plately}
+      POSTGRES_USER: ${POSTGRES_USER:-plately_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-plately_user} -d ${POSTGRES_DB:-plately}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+ 
+  # Spring Boot Backend  (placeholder)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: plately-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-plately}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-plately_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SERVER_PORT: 8080
+      SPRING_PROFILE: dev
+
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/workspace
+ 
+  # React + Vite Web Frontend  (placeholder)
+  web:
+    build:
+      context: ./frontend-web
+      dockerfile: Dockerfile
+    container_name: plately-web
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080/api
+    ports:
+      - "5173:80"
+ 
+# Named Volumes
+volumes:
+  postgres_data:
