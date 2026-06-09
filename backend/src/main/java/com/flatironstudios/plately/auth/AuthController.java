@@ -8,7 +8,7 @@ import com.flatironstudios.plately.auth.dto.AuthResult;
 import com.flatironstudios.plately.auth.dto.LoginRequest;
 import com.flatironstudios.plately.auth.dto.RegisterRequest;
 import com.flatironstudios.plately.security.CookieFactory;
-import com.flatironstudios.plately.user.dto.UserResponse;
+import com.flatironstudios.plately.user.UserResponseDTO;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +21,7 @@ public class AuthController {
     private AuthService authService;
     
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request, HttpServletResponse response) {
+    public ResponseEntity<UserResponseDTO> register(@RequestBody RegisterRequest request, HttpServletResponse response) {
         AuthResult result = authService.register(request);
         Cookie cookie = CookieFactory.createCookie(result.token());
         response.addCookie(cookie);
@@ -30,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest request, HttpServletResponse response) {
+    public ResponseEntity<UserResponseDTO> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         AuthResult result = authService.login(request);
         Cookie cookie = CookieFactory.createCookie(result.token());
         response.addCookie(cookie);
