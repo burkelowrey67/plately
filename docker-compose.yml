@@ -6,9 +6,9 @@ services:
     container_name: plately-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-plately}
-      POSTGRES_USER: ${POSTGRES_USER:-plately_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -31,12 +31,17 @@ services:
       db:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-plately}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-plately_user}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      SPRING_DATASOURCE_URL: ${POSTGRES_URL}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SERVER_PORT: 8080
       SPRING_PROFILE: dev
+
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+
+      SPOONACULAR_API_KEY: ${SPOONACULAR_API_KEY}
 
     ports:
       - "8080:8080"
