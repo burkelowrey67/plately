@@ -1,12 +1,12 @@
 package com.flatironstudios.plately.member;
 
 import java.time.Year;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public record MemberResponseDTO(
     UUID id, String name, DietType dietType, 
-    List<Allergen> allergies, int ageYrs, 
+    Set<Allergen> allergies, int ageYrs, 
     double heightMeters, double weightKgs, double weightGoalKgs) {
     
     public MemberResponseDTO(Member member) {

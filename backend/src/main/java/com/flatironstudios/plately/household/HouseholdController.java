@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -16,8 +17,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.flatironstudios.plately.member.Member;
 import com.flatironstudios.plately.member.MemberRequestDTO;
 import com.flatironstudios.plately.member.MemberResponseDTO;
+import com.flatironstudios.plately.user.User;
+import com.flatironstudios.plately.user.UserService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -26,7 +30,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/households")
 public class HouseholdController {
 
-    HouseholdService householdService;
+    @Autowired
+    private HouseholdService householdService;
+
+    @Autowired 
+    private UserService userService;
 
     public HouseholdController(HouseholdService householdService) {
         this.householdService = householdService;
@@ -34,7 +42,14 @@ public class HouseholdController {
 
     @GetMapping("/{householdId}")
     public ResponseEntity<HouseholdResponseDTO> getHousehold(@PathVariable UUID householdId, @AuthenticationPrincipal UUID userId) {
-        return ResponseEntity.ok(householdService.getHousehold(householdId, userId));
+        Household household = householdService.getHousehold(householdId, userId);
+        User user = userService.findById(userId);
+
+        return ResponseEntity.ok(new HouseholdResponseDTO(
+            household.getId(), household.getName(), household.getWeeklyBudget(), household.getMembers().size(), 
+            household.getMembers().stream().map(MemberResponseDTO::new).toList(),
+            user.getName()
+        ));
     }
 
     @GetMapping("/{householdId}/name")
@@ -82,14 +97,15 @@ public class HouseholdController {
 
     @GetMapping("/{householdId}/members")
     public ResponseEntity<Map<String, List<MemberResponseDTO>>> getMembers(@PathVariable UUID householdId, @AuthenticationPrincipal UUID userId) {
-        List<MemberResponseDTO> members = householdService.getMembers(householdId, userId);
-        return ResponseEntity.ok(Map.of("members", members));
+        List<Member> members = householdService.getMembers(householdId, userId);
+        List<MemberResponseDTO> memberResponses = members.stream().map(MemberResponseDTO::new).toList();
+        return ResponseEntity.ok(Map.of("members", memberResponses));
     }
 
     @GetMapping("/{householdId}/members/{memberId}")
     public ResponseEntity<MemberResponseDTO> getMember(@PathVariable UUID householdId, @PathVariable UUID memberId, @AuthenticationPrincipal UUID userId) {
-        MemberResponseDTO member = householdService.getMember(householdId, memberId, userId);
-        return ResponseEntity.ok(member);
+        Member member = householdService.getMember(householdId, memberId, userId);
+        return ResponseEntity.ok(new MemberResponseDTO(member));
     }
 
     @PutMapping("{householdId}/members/{memberId}")
@@ -99,7 +115,7 @@ public class HouseholdController {
             @Valid @RequestBody MemberRequestDTO request,
             @AuthenticationPrincipal UUID userId) {
 
-        MemberResponseDTO updated = householdService.updateMember(householdId, memberId, request, userId);
-        return ResponseEntity.ok(updated);
+        Member updated = householdService.updateMember(householdId, memberId, request, userId);
+        return ResponseEntity.ok(new MemberResponseDTO(updated));
     }
 }

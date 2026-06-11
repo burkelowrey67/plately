@@ -2,7 +2,6 @@ package com.flatironstudios.plately.household;
 
 import java.math.BigDecimal;
 import java.time.Year;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -15,9 +14,7 @@ import com.flatironstudios.plately.exception.ResponseStatusException;
 import com.flatironstudios.plately.member.Member;
 import com.flatironstudios.plately.member.MemberRepository;
 import com.flatironstudios.plately.member.MemberRequestDTO;
-import com.flatironstudios.plately.member.MemberResponseDTO;
-import com.flatironstudios.plately.user.User;
-import com.flatironstudios.plately.user.UserRepository;
+import com.flatironstudios.plately.user.UserService;
 
 @Service
 public class HouseholdService {
@@ -25,21 +22,15 @@ public class HouseholdService {
     @Autowired
     private HouseholdRepository householdRepository;
 
-    @Autowired 
-    private UserRepository userRepository;
-
     @Autowired
     private MemberRepository memberRepository;
 
-    public HouseholdResponseDTO getHousehold(UUID householdId, UUID userId) {
-        Household household = getHouseholdAndAuthorizeUser(householdId, userId);
-        User user = userRepository.getReferenceById(userId);
-        List<Member> members = household.getMembers();
+    @Autowired
+    private UserService userService;
 
-        return new HouseholdResponseDTO(
-            household.getId(), household.getName(), household.getWeeklyBudget(), 
-            members.size(), convertMembersToDTO(members), user.getName()
-        );
+    public Household getHousehold(UUID householdId, UUID userId) {
+        Household household = getHouseholdAndAuthorizeUser(householdId, userId);
+        return household;
     }
 
     public String getName(UUID householdId, UUID userId) {
@@ -84,7 +75,7 @@ public class HouseholdService {
         return member.getId();
     }   
 
-    public List<MemberResponseDTO> getMembers(UUID householdId, UUID userId) {
+    public List<Member> getMembers(UUID householdId, UUID userId) {
         Household household = getHouseholdAndAuthorizeUser(householdId, userId);
         List<Member> members = household.getMembers();
 
@@ -92,10 +83,10 @@ public class HouseholdService {
             throw new NoSuchElementException("Members not found");
         }
 
-        return convertMembersToDTO(members);
+        return members;
     }
 
-    public MemberResponseDTO getMember(UUID householdId, UUID memberId, UUID userId) {
+    public Member getMember(UUID householdId, UUID memberId, UUID userId) {
         getHouseholdAndAuthorizeUser(householdId, userId);
         Member member = memberRepository.find(householdId, memberId);
         
@@ -103,10 +94,10 @@ public class HouseholdService {
             throw new NoSuchElementException("Member not found");
         }
 
-        return new MemberResponseDTO(member);
+        return member;
     }
 
-    public MemberResponseDTO updateMember(UUID householdId, UUID memberId, MemberRequestDTO memberDTO, UUID userId) {
+    public Member updateMember(UUID householdId, UUID memberId, MemberRequestDTO memberDTO, UUID userId) {
         Household household = getHouseholdAndAuthorizeUser(householdId, userId);
         Member member = new Member(
                     household, memberDTO.getName(), memberDTO.getDietType(), memberDTO.getAllergies(), 
@@ -116,26 +107,17 @@ public class HouseholdService {
         
         memberRepository.save(member);
 
-        return new MemberResponseDTO(member);
+        return member;
     }
 
     private Household getHouseholdAndAuthorizeUser(UUID householdId, UUID userId) {
         Household household = householdRepository.findById(householdId)
             .orElseThrow(() -> new NoSuchElementException("Household not found"));
 
-        if (!userRepository.getReferenceById(userId).getHousehold().getId().equals(household.getId())) {
+        if (!userService.findById(userId).getHousehold().getId().equals(household.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not belong to this household");
         }
 
         return household;
-    }
-
-    private static List<MemberResponseDTO> convertMembersToDTO(List<Member> members) {
-        List<MemberResponseDTO> membersDTO = new ArrayList<>();
-        for (Member member : members) {
-            membersDTO.add(new MemberResponseDTO(member));
-        }
-        
-        return membersDTO;
     }
 }

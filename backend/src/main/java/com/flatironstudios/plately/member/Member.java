@@ -1,6 +1,6 @@
 package com.flatironstudios.plately.member;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import com.flatironstudios.plately.household.Household;
@@ -25,8 +25,11 @@ public class Member {
     @Column
     private DietType dietType;
 
-    @Column
-    private List<Allergen> allergies;
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "member_allergies", joinColumns = @JoinColumn(name = "member_id"))
+    @Column(name = "allergy")
+    private Set<Allergen> allergies;
 
     @Column(nullable = false)
     private int birthYear;
@@ -43,7 +46,7 @@ public class Member {
     protected Member() {}
 
     public Member(
-        Household household, String name, DietType dietType, List<Allergen> allergies,
+        Household household, String name, DietType dietType, Set<Allergen> allergies,
         int birthYear, double heightMeters, double weightKgs, double weightGoalKgs
     ) {
         this.household = household;
@@ -60,7 +63,7 @@ public class Member {
     public String getName() { return name; }
     public Household getHousehold() { return household; }
     public DietType getDietType() { return dietType; }
-    public List<Allergen> getAllergies() { return allergies; }
+    public Set<Allergen> getAllergies() { return allergies; }
     public int getBirthYear() { return birthYear; }
     public double getHeightMeters() { return heightMeters; }
     public double getWeightKgs() { return weightKgs; }
