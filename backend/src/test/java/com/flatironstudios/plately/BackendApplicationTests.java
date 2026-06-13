@@ -1,4 +1,4 @@
-package com.plately.backend;
+package com.flatironstudios.plately;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

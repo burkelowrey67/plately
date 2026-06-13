@@ -1,4 +1,4 @@
-package com.flatironstudios.plately.recipe;
+package com.flatironstudios.plately.ingredient;
 
 import java.util.List;
 

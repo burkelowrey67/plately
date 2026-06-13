@@ -5,7 +5,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;       
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record SpoonacularSearchResponseDTO(
+public record SpoonacularRecipeResponseDTO(
     Set<SpoonacularRecipeSummaryDTO> results, 
     int offset, int number, int totalResults
 ) {}

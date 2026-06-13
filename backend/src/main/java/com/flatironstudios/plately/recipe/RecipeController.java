@@ -34,7 +34,7 @@ public class RecipeController {
     }
 
     @GetMapping("/household/{householdId}/member/{memberId}")
-    public ResponseEntity<SpoonacularSearchResponseDTO> generateMember(
+    public ResponseEntity<SpoonacularRecipeResponseDTO> generateMember(
         @PathVariable UUID householdId, 
         @PathVariable UUID memberId,
         @AuthenticationPrincipal UUID userId

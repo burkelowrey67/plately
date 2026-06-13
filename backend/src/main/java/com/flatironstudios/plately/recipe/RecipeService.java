@@ -36,12 +36,12 @@ public class RecipeService {
 
     @Autowired UnionService unionService;
 
-    public SpoonacularSearchResponseDTO generateRecipes(UUID householdId, UUID memberId, UUID userId, int number) {
+    public SpoonacularRecipeResponseDTO generateRecipes(UUID householdId, UUID memberId, UUID userId, int number) {
         Member member = householdService.getMember(householdId, memberId, userId);
         return generateRecipes(member.getDietType(), member.getAllergies(), number);
     }
 
-    public SpoonacularSearchResponseDTO generateRecipes(DietType dietType, Set<Allergen> allergies, int number) {
+    public SpoonacularRecipeResponseDTO generateRecipes(DietType dietType, Set<Allergen> allergies, int number) {
         if (number < 1) throw new InvalidParameterException("Cannot return " + number + " number of recipes");
         if (dietType == null) dietType = DietType.NONE;
         if (allergies == null) allergies = new HashSet<>();
@@ -60,7 +60,7 @@ public class RecipeService {
             .toUriString();
 
 
-        SpoonacularSearchResponseDTO response = restTemplate.getForObject(url, SpoonacularSearchResponseDTO.class);
+        SpoonacularRecipeResponseDTO response = restTemplate.getForObject(url, SpoonacularRecipeResponseDTO.class);
 
         if (response.results().size() == 0) throw new NoSuchElementException("Recipes not found");
         return response;

@@ -3,9 +3,9 @@ package com.flatironstudios.plately.recipe;
 import java.util.List;
 
 public class MealPlanDTO {
-    private List<SpoonacularSearchResponseDTO> plans;
+    private List<SpoonacularRecipeResponseDTO> plans;
 
-    public void addPlan(SpoonacularSearchResponseDTO plan) {
+    public void addPlan(SpoonacularRecipeResponseDTO plan) {
         plans.add(plan);
     }
 }
