@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.flatironstudios.plately.auth.dto.AuthResult;
 import com.flatironstudios.plately.auth.dto.LoginRequest;
 import com.flatironstudios.plately.auth.dto.RegisterRequest;
+import com.flatironstudios.plately.exception.ResponseStatusException;
 import com.flatironstudios.plately.household.Household;
 import com.flatironstudios.plately.household.HouseholdRepository;
 import com.flatironstudios.plately.security.JwtService;
@@ -56,10 +58,10 @@ public class AuthService {
 
     public AuthResult login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,"User not found"));
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
         return new AuthResult(

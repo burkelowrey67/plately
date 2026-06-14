@@ -1,7 +1,11 @@
 package com.flatironstudios.plately.auth;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.flatironstudios.plately.auth.dto.AuthResult;
@@ -26,16 +30,16 @@ public class AuthController {
         Cookie cookie = CookieFactory.createCookie(result.token());
         response.addCookie(cookie);
 
-        return ResponseEntity.ok(result.user());
+        return new ResponseEntity<>(result.user(), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> login(@RequestBody LoginRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         AuthResult result = authService.login(request);
         Cookie cookie = CookieFactory.createCookie(result.token());
         response.addCookie(cookie);
 
-        return ResponseEntity.ok(result.user());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/logout")
@@ -43,5 +47,10 @@ public class AuthController {
         Cookie cookie = CookieFactory.createExpiredCookie();
         response.addCookie(cookie);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> me(@AuthenticationPrincipal UUID id) {
+        return ResponseEntity.ok(authService.me(id));
     }
 }
