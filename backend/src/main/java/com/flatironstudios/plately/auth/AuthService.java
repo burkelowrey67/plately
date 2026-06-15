@@ -36,7 +36,7 @@ public class AuthService {
     @Transactional
     public AuthResult register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Email already registered");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Email already registered");
         }
         
         Household houshold = new Household("My household", new BigDecimal(9999));
