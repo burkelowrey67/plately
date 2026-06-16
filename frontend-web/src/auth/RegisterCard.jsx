@@ -3,6 +3,7 @@ import { Card } from "../components/card";
 import { register } from "./authApi";
 import { Button } from "../components/button";
 import { useNavigate } from "react-router-dom";
+import "./AuthCard.css"
 
 export default function RegisterCard() {
     const [name, setName] = useState("");
@@ -14,11 +15,6 @@ export default function RegisterCard() {
 
     async function auth(event) {
         event.preventDefault();
-
-        if (name.trim() === "") {
-            setError("Please enter a name");
-            return;
-        }
 
         if (email.trim() === "") {
             setError("Please enter an email");
@@ -67,61 +63,57 @@ export default function RegisterCard() {
     }
 
     return (
-        <Card>
+        <Card className="auth-card">
             <h2>Register</h2>
 
             {error && <p style={{ color: "red" }}>{error}</p>}
 
-            <form onSubmit={auth}>
+            <form onSubmit={auth} className="auth-form">
 
-            <div>
-                <label>First Name</label>
-                <input 
-                    type="name"
-                    value={name}
-                    onChange={(e) => 
-                        setName(e.target.value)
-                    }
-                />
-            </div>
+                <div className="form-group">
+                    <label>Name</label>
+                    <input
+                        type="text"
+                        placeholder="Enter name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
+                </div>
 
-            <div>
-                <label>Email</label>
-                <input 
-                    type="email"
-                    value={email}
-                    onChange={(e) => 
-                        setEmail(e.target.value)
-                    }
-                />
-            </div>
+                <div className="form-group">
+                    <label>Email address</label>
+                    <input
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
 
-            <div>
-                <label>Password</label>
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) =>
-                        setPassword(e.target.value)
-                    }
-                />
-            </div>
+                <div className="form-group">
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        placeholder="Enter password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
 
-            <div>
-                <label>Re-type Password</label>
-                <input
-                    type="password"
-                    value={retype}
-                    onChange={(e) =>
-                        setRetype(e.target.value)
-                    }
-                />
-            </div>
+                <div className="form-group">
+                    <input
+                        type="password"
+                        placeholder="Re-type password"
+                        value={retype}
+                        onChange={(e) => setRetype(e.target.value)}
+                    />
+                </div>
 
-            <Button type="submit">
-                Register
-            </Button>
-        </form>
+                <Button type="submit">
+                    Register
+                </Button>
+
+            </form>
     </Card>
     );
 }

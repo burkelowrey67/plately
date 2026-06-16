@@ -1,9 +1,10 @@
 import LoginCard from "./LoginCard";
 import { Link } from "react-router-dom";
+import "./AuthPage.css"
 
 export default function LoginPage() {
     return (
-        <div>
+        <div className="auth-page">
             <h1>Plately</h1>
             <LoginCard/>
 

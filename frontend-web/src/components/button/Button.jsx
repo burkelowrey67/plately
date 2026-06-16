@@ -1,13 +1,14 @@
-import "./Button"
+import "./Button.css"
 
 export default function Button({
     children,
     type,
-    onClick
+    onClick,
+    className=""
 }) {
     return (
         <button
-            className="btn"
+            className={`button ${className}`}
             type={type}
             onClick={onClick}
         >
