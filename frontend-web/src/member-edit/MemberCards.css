@@ -1,0 +1,14 @@
+.member-card {
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+}
+
+.member-list {
+    background: var(--surface-secondary);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    height: 350px;
+}

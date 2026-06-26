@@ -1,0 +1,55 @@
+.welcome-card {
+    width: 100%;
+    max-width: 600px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    padding: 2.5rem;
+    border-radius: 1rem;
+
+    background-color: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    text-align: center;
+}
+
+.welcome-title {
+    margin: 0;
+    font-size: 2.25rem;
+}
+
+.welcome-slogan {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.welcome-text {
+    margin: 0;
+    color: #444;
+}
+
+.welcome-button {
+    width: 100%;
+}
+
+.name-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.household-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.money-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}

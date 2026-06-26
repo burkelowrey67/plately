@@ -1,23 +1,29 @@
 package com.flatironstudios.plately.security;
 
-import jakarta.servlet.http.Cookie;
+import org.springframework.http.ResponseCookie;
 
 public class CookieFactory {
 
 
-    public static Cookie createCookie(String token) {
-        Cookie c = new Cookie("jwt", token);
-        c.setHttpOnly(true);
-        c.setMaxAge(86400);
-        c.setPath("/");
+    public static ResponseCookie createCookie(String token) {
+        ResponseCookie c = ResponseCookie
+            .from("jwt", token)
+            .httpOnly(true)
+            .path("/")
+            .sameSite("Lax")
+            .maxAge(86400)
+            .build();
         return c;
     }
 
-    public static Cookie createExpiredCookie() {
-        Cookie c = new Cookie("jwt", null);
-        c.setHttpOnly(true);
-        c.setMaxAge(0);
-        c.setPath("/");
+    public static ResponseCookie createExpiredCookie() {
+        ResponseCookie c = ResponseCookie
+            .from("jwt", null)
+            .httpOnly(true)
+            .maxAge(0)
+            .path("/")
+            .build();
+            
         return c;
     }
 }

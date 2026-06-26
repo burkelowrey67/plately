@@ -20,26 +20,24 @@ public class RecipeController {
     @Autowired
     private RecipeService recipeService;
 
-    @GetMapping("/household/{householdId}")
+    @GetMapping("/household")
     public ResponseEntity<Map<String, List<RecipeGroupDTO>>> generateHousehold(
-        @PathVariable UUID householdId, 
         @AuthenticationPrincipal UUID userId,
         @RequestBody HouseholdRecipeRequestDTO request
     ) {
         return ResponseEntity.ok(
             Map.of(
                 "Groups", 
-                recipeService.generateRecipes(householdId, userId, request.dietStrategy(), request.number()
+                recipeService.generateRecipes(userId, request.dietStrategy(), request.number()
             )));
     }
 
-    @GetMapping("/household/{householdId}/member/{memberId}")
+    @GetMapping("/household/member/{memberId}")
     public ResponseEntity<SpoonacularRecipeResponseDTO> generateMember(
-        @PathVariable UUID householdId, 
         @PathVariable UUID memberId,
         @AuthenticationPrincipal UUID userId
     ) {
-        return ResponseEntity.ok(recipeService.generateRecipes(householdId, memberId, userId, 10));
+        return ResponseEntity.ok(recipeService.generateRecipes(memberId, userId, 10));
     }
 
     @GetMapping("/{recipeId}")

@@ -36,8 +36,8 @@ public class RecipeService {
 
     @Autowired UnionService unionService;
 
-    public SpoonacularRecipeResponseDTO generateRecipes(UUID householdId, UUID memberId, UUID userId, int number) {
-        Member member = householdService.getMember(householdId, memberId, userId);
+    public SpoonacularRecipeResponseDTO generateRecipes(UUID memberId, UUID userId, int number) {
+        Member member = householdService.getMember(memberId, userId);
         return generateRecipes(member.getDietType(), member.getAllergies(), number);
     }
 
@@ -66,9 +66,9 @@ public class RecipeService {
         return response;
     }
 
-    public List<RecipeGroupDTO> generateRecipes(UUID householdId, UUID userId, DietStrategy dietStrategy, int number) {
+    public List<RecipeGroupDTO> generateRecipes(UUID userId, DietStrategy dietStrategy, int number) {
         List<RecipeGroupDTO> responses = new ArrayList<>();
-        List<Member> members = householdService.getMembers(householdId, userId);
+        List<Member> members = householdService.getMembers(userId);
 
         if (dietStrategy == DietStrategy.UNION) {
             Set<Allergen> allergies = unionService.allergenUnion(members);

@@ -7,10 +7,8 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.flatironstudios.plately.exception.ResponseStatusException;
 import com.flatironstudios.plately.member.Member;
 import com.flatironstudios.plately.member.MemberRepository;
 import com.flatironstudios.plately.member.MemberRequestDTO;
@@ -28,13 +26,21 @@ public class HouseholdService {
     @Autowired
     private UserService userService;
 
-    public Household getHousehold(UUID householdId, UUID userId) {
-        Household household = getHouseholdAndAuthorizeUser(householdId, userId);
+    public Household createDefault() {
+        return new Household("My household", new BigDecimal(9999));
+    }
+
+    public void save(Household household) {
+        householdRepository.save(household);
+    }
+
+    public Household getHousehold(UUID userId) {
+        Household household = userService.findById(userId).getHousehold();
         return household;
     }
 
-    public String getName(UUID householdId, UUID userId) {
-        Household household = getHouseholdAndAuthorizeUser(householdId, userId);
+    public String getName(UUID userId) {
+        Household household = userService.findById(userId).getHousehold();
         String name = household.getName();
         
         if (name == null) throw new NoSuchElementException("Name not found");
@@ -42,13 +48,13 @@ public class HouseholdService {
         return name;
     }
 
-    public void updateName(String name, UUID householdId, UUID userId) {
-        Household household = getHouseholdAndAuthorizeUser(householdId, userId);
+    public void updateName(String name, UUID userId) {
+        Household household = userService.findById(userId).getHousehold();
         household.setName(name);
     }
 
-    public BigDecimal getBudget(UUID householdId, UUID userId) {
-        Household household = getHouseholdAndAuthorizeUser(householdId, userId);
+    public BigDecimal getBudget(UUID userId) {
+        Household household = userService.findById(userId).getHousehold();
         BigDecimal budget = household.getWeeklyBudget();
         
         if (budget == null) throw new NoSuchElementException("Budget not found");
@@ -56,13 +62,13 @@ public class HouseholdService {
         return budget;
     } 
 
-    public void updateBudget(BigDecimal budget, UUID householdId, UUID userId) {
-        Household household = getHouseholdAndAuthorizeUser(householdId, userId);
+    public void updateBudget(BigDecimal budget, UUID userId) {
+        Household household = userService.findById(userId).getHousehold();
         household.setWeeklyBudget(budget);
     }
 
-    public UUID addMember(UUID householdId, MemberRequestDTO memberDTO, UUID userId) {
-        Household household = getHouseholdAndAuthorizeUser(householdId, userId);
+    public Member addMember(MemberRequestDTO memberDTO, UUID userId) {
+        Household household = userService.findById(userId).getHousehold();
 
         Member member = new Member(
                             household, memberDTO.getName(), memberDTO.getDietType(), memberDTO.getAllergies(), 
@@ -72,11 +78,11 @@ public class HouseholdService {
 
         memberRepository.save(member);
 
-        return member.getId();
+        return member;
     }   
 
-    public List<Member> getMembers(UUID householdId, UUID userId) {
-        Household household = getHouseholdAndAuthorizeUser(householdId, userId);
+    public List<Member> getMembers(UUID userId) {
+        Household household = userService.findById(userId).getHousehold();
         List<Member> members = household.getMembers();
 
         if (members == null || members.size() == 0) {
@@ -86,38 +92,31 @@ public class HouseholdService {
         return members;
     }
 
-    public Member getMember(UUID householdId, UUID memberId, UUID userId) {
-        getHouseholdAndAuthorizeUser(householdId, userId);
-        Member member = memberRepository.find(householdId, memberId);
-        
-        if (member == null) {
-            throw new NoSuchElementException("Member not found");
-        }
+    public Member getMember(UUID memberId, UUID userId) {
+        List<Member> members = memberRepository.findByHouseholdId(userService.findById(userId).getHousehold().getId());
+
+        Member member = members
+            .stream()
+            .filter(m -> m.getId().equals(memberId))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("This member does not belong to this household"));
 
         return member;
     }
 
-    public Member updateMember(UUID householdId, UUID memberId, MemberRequestDTO memberDTO, UUID userId) {
-        Household household = getHouseholdAndAuthorizeUser(householdId, userId);
-        Member member = new Member(
-                    household, memberDTO.getName(), memberDTO.getDietType(), memberDTO.getAllergies(), 
-                    (int) (Year.now().getValue() - memberDTO.getAgeYrs()), memberDTO.getHeightMeters(), 
-                    memberDTO.getWeightKgs(), memberDTO.getWeightGoalKgs()
-                );  
-        
+    public Member updateMember(UUID memberId, MemberRequestDTO memberDTO, UUID userId) {
+
+        Member member = getMember(memberId, userId);
+
+        member.setName(memberDTO.getName());
+        member.setDietType(memberDTO.getDietType());
+        member.setBirthYear(Year.now().getValue() - memberDTO.getAgeYrs());
+        member.setHeightMeters(memberDTO.getHeightMeters());
+        member.setWeightKgs(memberDTO.getWeightKgs());
+        member.setWeightGoalKgs(memberDTO.getWeightGoalKgs());
+            
         memberRepository.save(member);
 
         return member;
-    }
-
-    private Household getHouseholdAndAuthorizeUser(UUID householdId, UUID userId) {
-        Household household = householdRepository.findById(householdId)
-            .orElseThrow(() -> new NoSuchElementException("Household not found"));
-
-        if (!userService.findById(userId).getHousehold().getId().equals(household.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not belong to this household");
-        }
-
-        return household;
     }
 }

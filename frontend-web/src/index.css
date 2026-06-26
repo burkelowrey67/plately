@@ -3,6 +3,7 @@
   --primary: #22c55e;
   --background: #f8fafc;
   --surface: #ffffff;
+  --surface-secondary: #f3f3f3;
   --text: #0f172a;
   --text-secondary: #64748b;
 
@@ -16,7 +17,9 @@
   --radius-md: 12px;
 
   /* Shadows */
-  --shadow-md: 0 4px 12px rgba(0,0,0,.08);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.09);
+  --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.08);
 
   --text: #6b6375;
   --text-h: #08060d;

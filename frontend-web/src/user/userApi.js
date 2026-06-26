@@ -1,6 +1,7 @@
-import api from "../api/axiosConfig"
+import { api } from "../api/axiosConfig"
 
 export async function updateName(name) {
-    const response = await api.patch("/user/name");
-    return response.data;
+    await api.patch("/user/name", {
+        name
+    });
 }

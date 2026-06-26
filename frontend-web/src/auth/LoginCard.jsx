@@ -1,20 +1,26 @@
 import { useState } from "react";
 import { Card } from "../components/card";
-import { login } from "./authApi";
+import { getCurrentUser, login } from "./authApi";
 import { Button } from "../components/button";
-import "./AuthCard.css"
+import { Form } from "../components/form";
+import { useNavigate } from "react-router-dom";
+import "../style/utilities.css"
+import { useAuth } from "./AuthContext";
 
 export default function LoginCard() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const navigate = useNavigate();
+    const { user, setUser } = useAuth();
 
     async function auth(event) {
         event.preventDefault();
 
         try {
-            console.log(email);
             const response = await login(email, password);
+            setUser(response);
+            navigate("/dashboard");
         } 
         
         catch(e) {
@@ -30,12 +36,12 @@ export default function LoginCard() {
     }
 
     return (
-        <Card className="auth-card">
+        <Card className="max-width-md full-width">
             <h2>Login</h2>
 
             {error && <p style={{ color: "red" }}>{error}</p>}
 
-            <form onSubmit={auth} className="auth-form">
+            <Form onSubmit={auth}>
 
                 <div className="form-group">
                     <label>Email address</label>
@@ -57,11 +63,11 @@ export default function LoginCard() {
                     />
                 </div>
 
-                <Button type="submit">
-                    Login
+                <Button type="submit" className="full-width">
+                    login
                 </Button>
 
-            </form>
+            </Form>
         </Card>
     )
 }

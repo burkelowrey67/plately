@@ -28,20 +28,24 @@ public class User {
     @Column(nullable = false)
     private String passwordHash;
 
-    @Column(nullable = false)
+    @Column
     private String name;
+
+    @Column
+    private OnboardStep onboardStep;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     protected User() {}
 
-    public User(String email, String passwordHash, String name) {
+    public User(String email, String passwordHash) {
         this.role = Role.USER;
         this.email = email;
         this.passwordHash = passwordHash;
-        this.name = name;
+        this.name = "Me";
         this.createdAt = LocalDateTime.now();
+        this.onboardStep = OnboardStep.WELCOME;
     }
 
     public UUID getId() { return id; }
@@ -51,10 +55,12 @@ public class User {
     public String getName() { return name; }
     public Household getHousehold() { return household; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+    public OnboardStep getOnboardStep() { return onboardStep; }
 
     public void setRole(Role role) { this.role = role; }
     public void setEmail(String email) { this.email = email; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public void setName(String name) { this.name = name; }
     public void setHouseHold(Household household) { this.household = household; }
+    public void setOnboardStep(OnboardStep onboardStep) { this.onboardStep = onboardStep; }
 }

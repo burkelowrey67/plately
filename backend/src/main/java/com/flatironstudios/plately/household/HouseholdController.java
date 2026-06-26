@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/api/households")
+@RequestMapping("/api/household")
 public class HouseholdController {
 
     @Autowired
@@ -40,9 +40,9 @@ public class HouseholdController {
         this.householdService = householdService;
     }
 
-    @GetMapping("/{householdId}")
-    public ResponseEntity<HouseholdResponseDTO> getHousehold(@PathVariable UUID householdId, @AuthenticationPrincipal UUID userId) {
-        Household household = householdService.getHousehold(householdId, userId);
+    @GetMapping("/info")
+    public ResponseEntity<HouseholdResponseDTO> getHousehold(@AuthenticationPrincipal UUID userId) {
+        Household household = householdService.getHousehold(userId);
         User user = userService.findById(userId);
 
         return ResponseEntity.ok(new HouseholdResponseDTO(
@@ -52,70 +52,68 @@ public class HouseholdController {
         ));
     }
 
-    @GetMapping("/{householdId}/name")
-    public ResponseEntity<Map<String, String>> getName(@PathVariable UUID householdId, @AuthenticationPrincipal UUID userId) {
-        return ResponseEntity.ok(Map.of("name", householdService.getName(householdId, userId)));
+    @GetMapping("/name")
+    public ResponseEntity<Map<String, String>> getName(@AuthenticationPrincipal UUID userId) {
+        return ResponseEntity.ok(Map.of("name", householdService.getName(userId)));
     }
 
-    @GetMapping("/{householdId}/budget")
-    public ResponseEntity<Map<String, BigDecimal>> getBudget(@PathVariable UUID householdId, @AuthenticationPrincipal UUID userId) {
-        return ResponseEntity.ok(Map.of("budget", householdService.getBudget(householdId, userId)));
+    @GetMapping("/budget")
+    public ResponseEntity<Map<String, BigDecimal>> getBudget(@AuthenticationPrincipal UUID userId) {
+        return ResponseEntity.ok(Map.of("budget", householdService.getBudget(userId)));
     }
 
-    @PatchMapping("/{householdId}/name")
+    @PatchMapping("/name")
     public ResponseEntity<Map<String, String>> updateName(
-        @PathVariable UUID householdId, 
+        
         @AuthenticationPrincipal UUID userId,
         @RequestBody @Valid UpdateNameRequestDTO request
     ) {
-        householdService.updateName(request.getName(), householdId, userId);
+        householdService.updateName(request.getName(), userId);
         return ResponseEntity.ok(Map.of("name", request.getName()));
     }
 
-    @PatchMapping("/{householdId}/budget")
+    @PatchMapping("/budget")
     public ResponseEntity<Map<String, BigDecimal>> updateBudget(
-        @PathVariable UUID householdId, 
+        
         @AuthenticationPrincipal UUID userId,
         @RequestBody @Valid UpdateBudgetRequestDTO request
     ) {
-        householdService.updateBudget(request.getWeeklyBudget(), householdId, userId);
+        householdService.updateBudget(request.getWeeklyBudget(), userId);
         return ResponseEntity.ok(Map.of("weeklyBudget", request.getWeeklyBudget()));
     }
 
 
-    @PostMapping("/{householdId}/members")
-    public ResponseEntity<Map<String, UUID>> addMember(
-            @PathVariable UUID householdId,
+    @PostMapping("/members")
+    public ResponseEntity<MemberResponseDTO> addMember(
             @RequestBody @Valid MemberRequestDTO request,
             @AuthenticationPrincipal UUID userId, 
             HttpServletResponse response
         ) {
         
-        UUID memberId = householdService.addMember(householdId, request, userId);
-        return ResponseEntity.ok(Map.of("id", memberId));
+        Member member = householdService.addMember(request, userId);
+        return ResponseEntity.ok(new MemberResponseDTO(member));
     }
 
-    @GetMapping("/{householdId}/members")
-    public ResponseEntity<Map<String, List<MemberResponseDTO>>> getMembers(@PathVariable UUID householdId, @AuthenticationPrincipal UUID userId) {
-        List<Member> members = householdService.getMembers(householdId, userId);
+    @GetMapping("/members")
+    public ResponseEntity<Map<String, List<MemberResponseDTO>>> getMembers(@AuthenticationPrincipal UUID userId) {
+        List<Member> members = householdService.getMembers(userId);
         List<MemberResponseDTO> memberResponses = members.stream().map(MemberResponseDTO::new).toList();
         return ResponseEntity.ok(Map.of("members", memberResponses));
     }
 
-    @GetMapping("/{householdId}/members/{memberId}")
-    public ResponseEntity<MemberResponseDTO> getMember(@PathVariable UUID householdId, @PathVariable UUID memberId, @AuthenticationPrincipal UUID userId) {
-        Member member = householdService.getMember(householdId, memberId, userId);
+    @GetMapping("/members/{memberId}")
+    public ResponseEntity<MemberResponseDTO> getMember(@PathVariable UUID memberId, @AuthenticationPrincipal UUID userId) {
+        Member member = householdService.getMember(memberId, userId);
         return ResponseEntity.ok(new MemberResponseDTO(member));
     }
 
-    @PutMapping("{householdId}/members/{memberId}")
+    @PutMapping("/members/{memberId}")
     public ResponseEntity<MemberResponseDTO> updateMember(
-            @PathVariable UUID householdId,
             @PathVariable UUID memberId,
             @Valid @RequestBody MemberRequestDTO request,
             @AuthenticationPrincipal UUID userId) {
 
-        Member updated = householdService.updateMember(householdId, memberId, request, userId);
+        Member updated = householdService.updateMember(memberId, request, userId);
         return ResponseEntity.ok(new MemberResponseDTO(updated));
     }
 }

@@ -3,15 +3,17 @@ import { Card } from "../components/card";
 import { register } from "./authApi";
 import { Button } from "../components/button";
 import { useNavigate } from "react-router-dom";
-import "./AuthCard.css"
+import { Form } from "../components/form";
+import "../style/utilities.css"
+import { useAuth } from "./AuthContext";
 
 export default function RegisterCard() {
-    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [retype, setRetype] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const { setUser } = useAuth();
 
     async function auth(event) {
         event.preventDefault();
@@ -43,9 +45,10 @@ export default function RegisterCard() {
 
         try {
             const response = await register(
-                name, email, password
+                email, password
             );
 
+            setUser(response);
             navigate("/login");
         }
 
@@ -63,22 +66,12 @@ export default function RegisterCard() {
     }
 
     return (
-        <Card className="auth-card">
+        <Card className="max-width-md full-width">
             <h2>Register</h2>
 
             {error && <p style={{ color: "red" }}>{error}</p>}
 
-            <form onSubmit={auth} className="auth-form">
-
-                <div className="form-group">
-                    <label>Name</label>
-                    <input
-                        type="text"
-                        placeholder="Enter name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-                </div>
+            <Form onSubmit={auth}>
 
                 <div className="form-group">
                     <label>Email address</label>
@@ -109,11 +102,11 @@ export default function RegisterCard() {
                     />
                 </div>
 
-                <Button type="submit">
-                    Register
+                <Button type="submit" className="full-width">
+                    register
                 </Button>
 
-            </form>
+            </Form>
     </Card>
     );
 }

@@ -68,4 +68,13 @@ public class Member {
     public double getHeightMeters() { return heightMeters; }
     public double getWeightKgs() { return weightKgs; }
     public double getWeightGoalKgs() { return weightGoalKgs; }
+
+
+    public void setName(String name) { this.name = name; }
+    public void setDietType(DietType dietType) { this.dietType = dietType; }
+    public void setAllergies(Set<Allergen> allergies) { this.allergies = allergies; }
+    public void setBirthYear(int birthYear) { this.birthYear = birthYear; }
+    public void setHeightMeters(double heightMeters) { this.heightMeters = heightMeters; }
+    public void setWeightKgs(double weightKgs) { this.weightKgs = weightKgs; }
+    public void setWeightGoalKgs(double weightGoalKgs) { this.weightGoalKgs = weightGoalKgs; }
 }

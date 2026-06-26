@@ -1,10 +1,10 @@
 import LoginCard from "./LoginCard";
 import { Link } from "react-router-dom";
-import "./AuthPage.css"
+import "../style/layouts.css"
 
 export default function LoginPage() {
     return (
-        <div className="auth-page">
+        <div className="centered-page">
             <h1>Plately</h1>
             <LoginCard/>
 
